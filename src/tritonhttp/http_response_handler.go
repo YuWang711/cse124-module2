@@ -35,21 +35,20 @@ func (hs *HttpServer) handleResponse(requestHeader *HttpRequestHeader, conn net.
 	var responseHeader HttpResponseHeader
 
 	filename := hs.DocRoot+requestHeader.Request
-	file,err := os.Stat(filename)
-	if err != nil {
-		log.Println(err)
+	if file,err:= os.Stat(filename);err == nil{
+		requestHeader.ResponseHeader = responseHeader
+		responseHeader.Request = requestHeader.Request
+		log.Println(requestHeader.Request)
+		responseHeader.Server =  "Go-Triton-Server"
+		responseHeader.Last_Modified = file.ModTime().String()
+		responseHeader.Content_Length = file.Size()
+		hs.sendResponse(responseHeader, conn)
 	} else if os.IsNotExist(err){
 		hs.handleFileNotFoundRequest(requestHeader, conn)
-	}
+	} else if err != nil && !os.IsNotExist(err){
 	//Calls file not found if file not found
-	requestHeader.ResponseHeader = responseHeader
-	responseHeader.Request = requestHeader.Request
-	log.Println(requestHeader.Request)
-	responseHeader.Server =  "Go-Triton-Server"
-	responseHeader.Last_Modified = file.ModTime().String()
-	responseHeader.Content_Length = file.Size()
-
-	hs.sendResponse(responseHeader, conn)
+		log.Println(err)
+	}
 	//Not sure what we are sending back?
 	return "Done"
 }
@@ -61,11 +60,18 @@ func (hs *HttpServer) sendResponse(responseHeader HttpResponseHeader, conn net.C
 		log.Fatal(err)
 	}
 	defer file.Close()
+	s := bufio.NewScanner(file)
+	var line_count int64
+	documents := []string{}
+	for s.Scan() {
+		line_count = line_count + 1
+		documents = append(documents, s.Text())
+	}
 	// Send headers
 	response_String := "HTTP/1.1 200 " + responseHeader.Request + "\r\n"
 	response_String = response_String + "Server: " + responseHeader.Server + "\r\n"
 	response_String = response_String + "Last-Modified: " + responseHeader.Last_Modified + "\r\n"
-	response_String = response_String + "Content-Length: " +  strconv.FormatInt(responseHeader.Content_Length,10) + "\r\n"
+	response_String = response_String + "Content-Length: " +  strconv.FormatInt((responseHeader.Content_Length+line_count),10) + "\r\n"
 	split_data_type := strings.Split(responseHeader.Request, ".")
 	response_String = response_String + "Content-Type: " + hs.MIMEMap["."+split_data_type[1]] + "\r\n\r\n"
 	// Send file if required
@@ -74,11 +80,9 @@ func (hs *HttpServer) sendResponse(responseHeader HttpResponseHeader, conn net.C
 	if err != nil {
 		log.Println("error: ", err)
 	}
-	s := bufio.NewScanner(file)
-	for s.Scan(){
-		line := s.Text()
-		log.Println("Sending:", line)
-		line_byte := []byte(line)
+	for i,s := range documents{
+		log.Println("Sending:", documents[i])
+		line_byte := []byte(s)
 		_,err := conn.Write(line_byte)
 		if err != nil {
 			return
