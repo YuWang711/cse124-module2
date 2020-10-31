@@ -46,6 +46,9 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 					addHeader(header, &requestHeader)
 				}
 			}
+			if requestHeader.Header["Host"] == ""{
+				hs.handleBadRequest(conn)
+			}
 			requestHeaderArray = append(requestHeaderArray, requestHeader)
 		} else
 		{
@@ -107,9 +110,10 @@ func checkRequest(str string, requestHeader *HttpRequestHeader) {
 }
 
 func addHeader(str string, requestHeader *HttpRequestHeader){
-	header_string := strings.Split(str, ":")
+	new_str := strings.Replace(str, " ", "", -1)
+	header_string := strings.Split(new_str, ":")
 	log.Println(header_string)
 	if len(header_string) > 1 {
-		requestHeader.Header[header_string[0]] = strings.Replace(header_string[1], " ", "", -1)
+		requestHeader.Header[header_string[0]] = header_string[1]
 	}
 }
