@@ -100,7 +100,7 @@ func checkRequest(str string, requestHeader *HttpRequestHeader) {
 	}
 	if request_string[0] == "GET" && request_string[2] == "HTTP/1.1"{
 		log.Println("GET CHECKED")
-		if request_string[1] == "/"{
+		if request_string[1][len(request_string[1])-1] == '/'{
 			requestHeader.Request = "/index.html"
 			requestHeader.Code = 200
 			requestHeader.Done = "False"
@@ -115,9 +115,11 @@ func checkRequest(str string, requestHeader *HttpRequestHeader) {
 				requestHeader.Done = "False"
 			}
 		}
+		return
 	} else {
 		requestHeader.Code = 400
 		requestHeader.Done = "False"
+		return
 	}
 }
 
