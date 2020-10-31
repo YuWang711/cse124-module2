@@ -67,6 +67,7 @@ func (hs *HttpServer) sendResponse(responseHeader HttpResponseHeader, conn net.C
 		line_count = line_count + 1
 		documents = append(documents, s.Text())
 	}
+	log.Println("Content Length: ", responseHeader.Content_Length)
 	// Send headers
 	response_String := "HTTP/1.1 200 " + responseHeader.Request + "\r\n"
 	response_String = response_String + "Server: " + responseHeader.Server + "\r\n"
