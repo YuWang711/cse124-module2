@@ -49,8 +49,9 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			if requestHeader.Header["Host"] == "" || requestHeader.Code == 400{
 				hs.handleBadRequest(conn)
 				requestHeader.Done = "True"
+			} else {
+				requestHeaderArray = append(requestHeaderArray, requestHeader)
 			}
-			requestHeaderArray = append(requestHeaderArray, requestHeader)
 		} else
 		{
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
@@ -92,6 +93,11 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 
 func checkRequest(str string, requestHeader *HttpRequestHeader) {
 	request_string := strings.Split(str, " ")
+	if len(request_string) < 3{
+		requestHeader.Code = 400
+		requestHeader.Done = "False"
+		return
+	}
 	if request_string[0] == "GET" && request_string[2] == "HTTP/1.1"{
 		log.Println("GET CHECKED")
 		if request_string[1] == "/"{
