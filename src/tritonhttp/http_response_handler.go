@@ -34,7 +34,7 @@ func (hs *HttpServer) handleResponse(requestHeader *HttpRequestHeader, conn net.
 	//Create a response header, then record the size that we had send so far.
 	var responseHeader HttpResponseHeader
 
-	filename := "./sample_htdocs"+requestHeader.Request
+	filename := hs.DocRoot+requestHeader.Request
 	file,err := os.Stat(filename)
 	if err != nil {
 		log.Println(err)
@@ -56,7 +56,7 @@ func (hs *HttpServer) handleResponse(requestHeader *HttpRequestHeader, conn net.
 
 func (hs *HttpServer) sendResponse(responseHeader HttpResponseHeader, conn net.Conn) {
 
-	file,err := os.Open("./sample_htdocs"+responseHeader.Request)
+	file,err := os.Open(hs.DocRoot+responseHeader.Request)
 	if err != nil {
 		log.Fatal(err)
 	}

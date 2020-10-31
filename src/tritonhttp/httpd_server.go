@@ -16,7 +16,7 @@ func NewHttpdServer(port, docRoot, mimePath string) (*HttpServer, error) {
 
 	// Initialize mimeMap for server to refer
 	var tritonhttp HttpServer
-	file,err := os.Open("./src/mime.types")
+	file,err := os.Open(mimePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -24,7 +24,11 @@ func NewHttpdServer(port, docRoot, mimePath string) (*HttpServer, error) {
 
 	scanner := bufio.NewScanner(file)
 
+	tritonhttp.ServerPort = port
+	tritonhttp.MIMEPath = mimePath
+	tritonhttp.DocRoot = docRoot
 	tritonhttp.MIMEMap = make(map[string]string)
+
 
 	for scanner.Scan(){
 		s := scanner.Text()
@@ -49,8 +53,12 @@ func (hs *HttpServer) Start() (err error) {
 	log.Println("starting server")
 	//port := flag.Int("port", 3333, "Port to accept connections on.")
 	//host := flag.String("host", "127.0.0.1", "Host or IP to bind to")
+	log.Println("Server Info ")
+	log.Println("Server Port: ", hs.ServerPort)
+	log.Println("DocRoot: ", hs.DocRoot)
+	log.Println("MIMEPATH: ", hs.MIMEPath)
 
-	listen, err := net.Listen("tcp", ":8080")
+	listen, err := net.Listen("tcp", hs.ServerPort)
 
 	if err != nil {
 		log.Panicln(err)
