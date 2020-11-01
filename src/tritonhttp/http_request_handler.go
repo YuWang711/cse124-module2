@@ -120,9 +120,13 @@ func checkRequest(str string, requestHeader *HttpRequestHeader) {
 
 func addHeader(str string, requestHeader *HttpRequestHeader){
 	new_str := strings.ReplaceAll(str, " ", "")
-	header_string := strings.Split(new_str, ":")
-	log.Println(header_string)
-	if len(header_string) == 2 {
-		requestHeader.Header[header_string[0]] = header_string[1]
-	} 
+	if strings.Contains(new_str, ":"){
+		header_string := strings.Split(new_str, ":")
+		log.Println(header_string)
+		if len(header_string) == 2 {
+			requestHeader.Header[header_string[0]] = header_string[1]
+		}
+	} else {
+		requestHeader.Code = 400
+	}
 }
