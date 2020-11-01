@@ -56,12 +56,12 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
 				log.Println("read timeout:", err)
 				if len(requestHeaderArray) < 1 {
-					hs.handleBadRequest(conn)
+				//	hs.handleBadRequest(conn)
 					return
 				}
 			} else if err == io.EOF {
 				log.Println("Closed Connection Dectected")
-				for len(requestHeaderArray) > 0{
+				if len(requestHeaderArray) > 0 {
 					//Finish sending response
 				}
 				conn.Close()
@@ -73,7 +73,9 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 		for i,Request := range requestHeaderArray[:]{
 			//Finish sending response
 			go func() {
-				Request.Done = hs.handleResponse(&Request,conn)
+				if Request.Done != "Done" {
+					Request.Done = hs.handleResponse(&Request,conn)
+				}
 				if Request.Done == "Done"{
 					requestHeaderArray = append(requestHeaderArray[:i], requestHeaderArray[i+1:]...)
 				}
