@@ -50,7 +50,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			if _, okay := requestHeader.Header["Host"]; !okay{
 				requestHeader.Code = 400
 				hs.handleBadRequest(conn)
-				return
 			} else {
 				requestHeaderArray = append(requestHeaderArray, requestHeader)
 			}
