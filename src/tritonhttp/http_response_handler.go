@@ -27,6 +27,7 @@ func (hs *HttpServer) handleFileNotFoundRequest(requestHeader *HttpRequestHeader
 	if err != nil {
 		log.Println("error: ", err)
 	}
+	requestHeader.Done = "Done"
 }
 
 func (hs *HttpServer) handleResponse(requestHeader *HttpRequestHeader, conn net.Conn) (result string) {
