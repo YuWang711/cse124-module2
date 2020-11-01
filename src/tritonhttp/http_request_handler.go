@@ -40,6 +40,11 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			log.Println("size:", size)
 			split_request := strings.Split(requestString, "\r\n")
 			checkRequest(split_request[0], &requestHeader)
+			if requestHeader.Code == 400 {
+				hs.handleBadRequest(conn)
+				conn.Close()
+				return
+			}
 			requestHeader.Header = make(map[string]string)
 			for _,header := range split_request[1: len(split_request)-1] {
 				log.Println("Header: ", len(header))
@@ -47,10 +52,9 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 					addHeader(header, &requestHeader)
 				}
 			}
-			if _, okay := requestHeader.Header["Host"]; !okay || requestHeader.Code == 400{
+			if _, okay := requestHeader.Header["Host"]; !okay{
 				requestHeader.Code = 400
 				hs.handleBadRequest(conn)
-				conn.Close()
 				return
 			} else {
 				requestHeaderArray = append(requestHeaderArray, requestHeader)
