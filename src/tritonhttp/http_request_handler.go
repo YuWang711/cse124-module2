@@ -46,7 +46,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 					addHeader(header, &requestHeader)
 				}
 			}
-			if _, okay := requestHeader.Header["Host"]; okay || requestHeader.Code == 400{
+			if _, okay := requestHeader.Header["Host"]; !okay || requestHeader.Code == 400{
 				hs.handleBadRequest(conn)
 				requestHeader.Done = "True"
 			} else {
