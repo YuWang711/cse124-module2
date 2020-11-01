@@ -60,13 +60,23 @@ func (hs *HttpServer) sendResponse(responseHeader HttpResponseHeader, conn net.C
 		log.Fatal(err)
 	}
 	defer file.Close()
+	documents := []string{}
 	s := bufio.NewScanner(file)
+	var line_count int64
+	for s.Scan(){
+		line := s.Text()
+		if line == ""{
+			line_count = line_count + 1
+		} else {
+			documents = append(documents, line)
+		}
+	}
 	log.Println("Content Length: ", responseHeader.Content_Length)
 	// Send headers
 	response_String := "HTTP/1.1 200 " + responseHeader.Request + "\r\n"
 	response_String = response_String + "Server: " + responseHeader.Server + "\r\n"
 	response_String = response_String + "Last-Modified: " + responseHeader.Last_Modified + "\r\n"
-	response_String = response_String + "Content-Length: " +  strconv.FormatInt(responseHeader.Content_Length,10) + "\r\n"
+	response_String = response_String + "Content-Length: " +  strconv.FormatInt(responseHeader.Content_Length-line_count,10) + "\r\n"
 	split_data_type := strings.Split(responseHeader.Request, ".")
 	response_String = response_String + "Content-Type: " + hs.MIMEMap["."+split_data_type[1]] + "\r\n\r\n"
 	// Send file if required
@@ -75,9 +85,9 @@ func (hs *HttpServer) sendResponse(responseHeader HttpResponseHeader, conn net.C
 	if err != nil {
 		log.Println("error: ", err)
 	}
-	for s.Scan(){
-		line := s.Text()
-		line_byte := []byte(line)
+	for i,s := range documents{
+		line_byte := []byte(s)
+		log.Println("sending: ",documents[i])
 		_,err := conn.Write(line_byte)
 		if err != nil {
 			return
