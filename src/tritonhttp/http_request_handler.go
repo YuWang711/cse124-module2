@@ -52,8 +52,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			} else {
 				requestHeaderArray = append(requestHeaderArray, requestHeader)
 			}
-		} else
-		{
+		} else	{
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
 				log.Println("read timeout:", err)
 				if len(requestHeaderArray) < 1 {
@@ -68,7 +67,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 				conn.Close()
 				return
 			}
-			hs.handleBadRequest(conn)
 			log.Println("read error:", err)
 		}
 
