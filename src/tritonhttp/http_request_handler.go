@@ -124,7 +124,7 @@ func addHeader(str string, requestHeader *HttpRequestHeader){
 	log.Println(header_string)
 	if len(header_string) == 2 {
 		requestHeader.Header[header_string[0]] = header_string[1]
-	} else {
+	} else if len(header_string) < 2 {
 		requestHeader.Code = 400
 	}
 }
