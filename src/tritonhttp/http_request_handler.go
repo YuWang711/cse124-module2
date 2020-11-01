@@ -36,18 +36,20 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			requestString := string(buf)
 			log.Println("request:", requestString)
 			log.Println("size:", size)
-			split_request := strings.Split(requestString, "\r\n")
-			checkRequest(split_request[0], &requestHeader)
-			requestHeader.Header = make(map[string]string)
-			for _,header := range split_request[1: len(split_request)-1] {
-				log.Println("Header: ", len(header))
-				if header != "" {
-					addHeader(header, &requestHeader)
+			if requestString[len(requestString)-5:len(requestString)-1] == "\r\n" {
+				split_request := strings.Split(requestString, "\r\n")
+				checkRequest(split_request[0], &requestHeader)
+				requestHeader.Header = make(map[string]string)
+				for _,header := range split_request[1: len(split_request)-1] {
+					log.Println("Header: ", len(header))
+					if header != "" {
+						addHeader(header, &requestHeader)
+					}
 				}
-			}
-			if _, okay := requestHeader.Header["Host"]; !okay{
-				requestHeader.Code = 400
-				hs.handleBadRequest(conn)
+				if _, okay := requestHeader.Header["Host"]; !okay{
+					requestHeader.Code = 400
+					hs.handleBadRequest(conn)
+				}
 			}
 		} else	{
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
