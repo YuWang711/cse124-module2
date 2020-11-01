@@ -39,7 +39,7 @@ func (hs *HttpServer) handleResponse(requestHeader *HttpRequestHeader, conn net.
 		requestHeader.ResponseHeader = responseHeader
 		responseHeader.Request = requestHeader.Request
 		log.Println(requestHeader.Request)
-		responseHeader.Server =  "Go-Triton-Server"
+		responseHeader.Server =  "Go-Triton-Server-YuWang"
 		responseHeader.Last_Modified = file.ModTime().String()
 		responseHeader.Content_Length = file.Size()
 		hs.sendResponse(responseHeader, conn)
@@ -81,7 +81,8 @@ func (hs *HttpServer) sendResponse(responseHeader HttpResponseHeader, conn net.C
 	response_String = response_String + "Content-Type: " + hs.MIMEMap["."+split_data_type[1]] + "\r\n\r\n"
 	// Send file if required
 	response_Byte := []byte(response_String)
-	_,err = conn.Write(response_Byte)
+	n,err := conn.Write(response_Byte)
+	log.Println("Header Size: ", n)
 	if err != nil {
 		log.Println("error: ", err)
 	}
