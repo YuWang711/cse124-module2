@@ -42,7 +42,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			checkRequest(split_request[0], &requestHeader)
 			if requestHeader.Code == 400 {
 				hs.handleBadRequest(conn)
-				conn.Close()
 				return
 			}
 			requestHeader.Header = make(map[string]string)
