@@ -79,15 +79,8 @@ func (hs *HttpServer) sendResponse(responseHeader HttpResponseHeader, conn net.C
 	b := make([]byte, 1000)
 
 	for {
-		size, err := s.Read(b)
-		if err != nil {
-			log.Println("ReadFile error: ", err)
-			break
-		}
-		_,s_err := conn.Write(b[0:size])
-		if s_err != nil{
-			log.Println("Send Error: ", s_err)
-		}
+		size,_:= s.Read(b)
+		conn.Write(b[0:size])
 	}
 	// Hint - Use the bufio package to write response
 }
