@@ -59,8 +59,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 				//	hs.handleBadRequest(conn)
 					return
 				} else if len(requestHeaderArray) > 0 {
-					
-
+					return
 				}
 			} else if err == io.EOF {
 				log.Println("Closed Connection Dectected")
