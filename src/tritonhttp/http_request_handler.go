@@ -93,6 +93,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 
 func checkRequest(str string, requestHeader *HttpRequestHeader) {
 	request_string := strings.Split(str, " ")
+	//If missing one out of three content
 	if len(request_string) < 3{
 		requestHeader.Code = 400
 		requestHeader.Done = "False"
@@ -115,6 +116,9 @@ func checkRequest(str string, requestHeader *HttpRequestHeader) {
 			requestHeader.Code = 400
 			requestHeader.Done = "False"
 		}
+	} else {
+		requestHeader.Code = 400
+		requestHeader.Done = "False"
 	}
 	return
 }
