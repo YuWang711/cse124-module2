@@ -73,7 +73,7 @@ func (hs *HttpServer) sendResponse(responseHeader HttpResponseHeader, conn net.C
 	response_String = response_String + "Last-Modified: " + responseHeader.Last_Modified + "\r\n"
 	response_String = response_String + "Content-Length: " +  strconv.FormatInt(responseHeader.Content_Length,10) + "\r\n"
 	split_data_type := strings.Split(responseHeader.Request, ".")
-	response_String = response_String + "Content-Type: " + hs.MIMEMap["."+split_data_type[1]] + "\r\n\r\n"
+	response_String = response_String + "Content-Type: " + hs.MIMEMap["."+split_data_type[len(split_data_type)-1]] + "\r\n\r\n"
 	// Send file if required
 	response_Byte := []byte(response_String)
 	n,err := conn.Write(response_Byte)
