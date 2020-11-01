@@ -61,10 +61,6 @@ func (hs *HttpServer) sendResponse(responseHeader HttpResponseHeader, conn net.C
 	}
 	defer file.Close()
 	s := bufio.NewScanner(file)
-	documents := []string{}
-	for s.Scan() {
-		documents = append(documents, s.Text())
-	}
 	log.Println("Content Length: ", responseHeader.Content_Length)
 	// Send headers
 	response_String := "HTTP/1.1 200 " + responseHeader.Request + "\r\n"
@@ -79,9 +75,9 @@ func (hs *HttpServer) sendResponse(responseHeader HttpResponseHeader, conn net.C
 	if err != nil {
 		log.Println("error: ", err)
 	}
-	for i,s := range documents{
-		log.Println("Sending:", documents[i])
-		line_byte := []byte(s)
+	for s.Scan(){
+		line := s.Text()
+		line_byte := []byte(line)
 		_,err := conn.Write(line_byte)
 		if err != nil {
 			return
