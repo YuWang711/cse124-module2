@@ -46,12 +46,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 					addHeader(header, &requestHeader)
 				}
 			}
-			if _, okay := requestHeader.Header["Host"]; !okay || requestHeader.Code == 400{
-				hs.handleBadRequest(conn)
-				requestHeader.Done = "True"
-			} else {
-				requestHeaderArray = append(requestHeaderArray, requestHeader)
-			}
+			requestHeaderArray = append(requestHeaderArray, requestHeader)
 		} else	{
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
 				log.Println("read timeout:", err)
@@ -66,14 +61,18 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 
 		for i,Request := range requestHeaderArray[:]{
 			//Finish sending response
-			go func() {
-				if Request.Done != "Done" {
-					Request.Done = hs.handleResponse(&Request,conn)
-				}
-				if Request.Done == "Done"{
-					requestHeaderArray = append(requestHeaderArray[:i], requestHeaderArray[i+1:]...)
-				}
-			}()
+			if _, okay := Request.Header["Host"]; !okay || Request.Code == 400 {
+				hs.handleBadRequest(conn)
+			} else {
+				go func() {
+					if Request.Done != "Done" {
+						Request.Done = hs.handleResponse(&Request,conn)
+					}
+					if Request.Done == "Done"{
+						requestHeaderArray = append(requestHeaderArray[:i], requestHeaderArray[i+1:]...)
+					}
+				}()
+			}
 		}
 		// Handle any complete requests
 		//if timeout occurs
