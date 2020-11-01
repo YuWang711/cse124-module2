@@ -63,6 +63,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			//Finish sending response
 			if _, okay := Request.Header["Host"]; !okay || Request.Code == 400 {
 				hs.handleBadRequest(conn)
+				conn.Close()
 			} else {
 				go func() {
 					if Request.Done != "Done" {
