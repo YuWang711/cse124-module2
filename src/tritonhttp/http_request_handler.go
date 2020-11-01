@@ -50,6 +50,8 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			if _, okay := requestHeader.Header["Host"]; !okay || requestHeader.Code == 400{
 				requestHeader.Code = 400
 				hs.handleBadRequest(conn)
+				conn.Close()
+				return
 			} else {
 				requestHeaderArray = append(requestHeaderArray, requestHeader)
 			}
@@ -67,7 +69,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 
 			//Finish sending response
 		for i,Request := range requestHeaderArray[:]{
-			requestHeader := requestHeaderArray[i]
 			go func() {
 				requestHeader := requestHeaderArray[i]
 				if requestHeader.Done != "Done" && requestHeader.Code == 200 {
@@ -81,9 +82,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 					requestHeaderArray = append(requestHeaderArray[:i], requestHeaderArray[i+1:]...)
 				}
 			}()
-			if requestHeader.Code == 400{
-				conn.Close()
-			}
 		}
 		// Handle any complete requests
 		//if timeout occurs
