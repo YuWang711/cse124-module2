@@ -17,6 +17,7 @@ func (hs *HttpServer) handleBadRequest(conn net.Conn) {
 	if err != nil {
 		log.Println("error: ", err)
 	}
+	conn.Close()
 }
 
 func (hs *HttpServer) handleFileNotFoundRequest(requestHeader *HttpRequestHeader, conn net.Conn) {

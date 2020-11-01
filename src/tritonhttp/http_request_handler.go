@@ -26,8 +26,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 	// Start a loop for reading requests continuously
 
 	buf := make([]byte, 1024)
-	//var requestHeaderArray []HttpRequestHeader
-	//c := bufio.NewReader(conn)
 	for {
 		// Validate the request lines that were read
 		conn.SetReadDeadline(time.Now().Add(timeoutDuration))
@@ -50,8 +48,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			if _, okay := requestHeader.Header["Host"]; !okay{
 				requestHeader.Code = 400
 				hs.handleBadRequest(conn)
-			} else {
-				//requestHeaderArray = append(requestHeaderArray, requestHeader)
 			}
 		} else	{
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
@@ -65,23 +61,18 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			log.Println("read error:", err)
 		}
 
-			//Finish sending response
-		//for i,Request := range requestHeaderArray[:]{
-			go func() {
-				//requestHeader := requestHeaderArray[i]
-				if requestHeader.Done != "Done" && requestHeader.Code == 200 {
-					requestHeader.Done = hs.handleResponse(&requestHeader,conn)
-				} else if requestHeader.Code == 400 {
-					hs.handleBadRequest(conn)
-					requestHeader.Done = "Done"
-	//				requestHeaderArray = append(requestHeaderArray[:i], requestHeaderArray[i+1:]...)
-					return
-				}
-				if requestHeader.Done == "Done"{
-	//				requestHeaderArray = append(requestHeaderArray[:i], requestHeaderArray[i+1:]...)
-				}
-			}()
-		//}
+		//Finish sending response
+		go func() {
+			if requestHeader.Done != "Done" && requestHeader.Code == 200 {
+				requestHeader.Done = hs.handleResponse(&requestHeader,conn)
+			} else if requestHeader.Code == 400 {
+				hs.handleBadRequest(conn)
+				requestHeader.Done = "Done"
+				return
+			}
+			if requestHeader.Done == "Done"{
+			}
+		}()
 		// Handle any complete requests
 		//if timeout occurs
 		// Set a timeout for read operation
