@@ -62,7 +62,6 @@ func (hs *HttpServer) sendResponse(responseHeader HttpResponseHeader, conn net.C
 	defer file.Close()
 	documents := []string{}
 	s := bufio.NewScanner(file)
-	var line_count int64
 	for s.Scan(){
 		line := s.Text()
 		documents = append(documents, line)
