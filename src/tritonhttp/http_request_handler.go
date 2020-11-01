@@ -127,7 +127,7 @@ func addHeader(str string, requestHeader *HttpRequestHeader){
 	new_str := strings.Replace(str, " ", "", -1)
 	header_string := strings.Split(new_str, ":")
 	log.Println(header_string)
-	if len(header_string) >= 1 {
+	if len(header_string) == 2 {
 		requestHeader.Header[header_string[0]] = header_string[1]
-	} 
+	}
 }
