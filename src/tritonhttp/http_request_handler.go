@@ -37,7 +37,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			requestString = requestString + string(buf)
 			log.Println("request:", requestString)
 			log.Println("size:", size)
-			if requestString[len(requestString)-5:len(requestString)-1] == "\r\n" {
+			if strings.Contains(requestString, "\r\n\r\n") {
 				split_request := strings.Split(requestString, "\r\n")
 				checkRequest(split_request[0], &requestHeader)
 				requestHeader.Header = make(map[string]string)
@@ -73,8 +73,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 				hs.handleBadRequest(conn)
 				requestHeader.Done = "Done"
 				return
-			}
-			if requestHeader.Done == "Done"{
 			}
 		}()
 		// Handle any complete requests

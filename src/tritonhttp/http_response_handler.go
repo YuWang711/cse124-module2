@@ -72,10 +72,7 @@ func (hs *HttpServer) sendResponse(responseHeader HttpResponseHeader, conn net.C
 	response_String = response_String + "Content-Type: " + hs.MIMEMap["."+split_data_type[len(split_data_type)-1]] + "\r\n\r\n"
 	// Send file if required
 	response_Byte := []byte(response_String)
-	n,h_err := conn.Write(response_Byte)
-	if h_err != nil {
-		log.Println("Header Error : ", h_err)
-	}
+	n,_ := conn.Write(response_Byte)
 	log.Println("Header Size: ", n)
 	s := bufio.NewReader(file)
 	b := make([]byte, 1000)
