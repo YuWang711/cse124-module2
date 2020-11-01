@@ -55,17 +55,9 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 		} else	{
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
 				log.Println("read timeout:", err)
-				if len(requestHeaderArray) == 0{
-				//	hs.handleBadRequest(conn)
-					return
-				} else if len(requestHeaderArray) > 0 {
-					return
-				}
+				return
 			} else if err == io.EOF {
 				log.Println("Closed Connection Dectected")
-				if len(requestHeaderArray) > 0 {
-					//Finish sending response
-				}
 				conn.Close()
 				return
 			}
