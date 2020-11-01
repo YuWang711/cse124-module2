@@ -26,6 +26,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 	// Start a loop for reading requests continuously
 
 	buf := make([]byte, 1024)
+	var requestString string
 	for {
 		// Validate the request lines that were read
 		conn.SetReadDeadline(time.Now().Add(timeoutDuration))
@@ -33,7 +34,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 		// buf is unreadable somehow
 		var requestHeader HttpRequestHeader
 		if size,err := conn.Read(buf); err == nil{
-			requestString := string(buf)
+			requestString = requestString + string(buf)
 			log.Println("request:", requestString)
 			log.Println("size:", size)
 			if requestString[len(requestString)-5:len(requestString)-1] == "\r\n" {
@@ -50,7 +51,8 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 					requestHeader.Code = 400
 					hs.handleBadRequest(conn)
 				}
-			}
+				requestString = ""
+			} 
 		} else	{
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
 				log.Println("read timeout:", err)
