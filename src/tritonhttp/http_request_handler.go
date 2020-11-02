@@ -33,26 +33,26 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 		conn.SetReadDeadline(time.Now().Add(timeoutDuration))
 		//Double CRLF means the quest is ended
 		// buf is unreadable somehow
-		var requestHeader HttpRequestHeader
 		if _,err := conn.Read(buf); err == nil{
 			requestString = requestString + string(buf)
 			log.Println("request:", requestString)
 			if strings.Contains(requestString, "\r\n\r\n") {
 				requests := strings.Split(requestString, "\r\n\r\n")
 				for _,request := range requests {
+					var requestHeader HttpRequestHeader
 					if strings.Contains(request, "\r\n"){
 						split_request := strings.Split(request, "\r\n")
 						split_request = append(split_request, "")
 						checkRequest(split_request[0], &requestHeader)
 						requestHeader.Header = make(map[string]string)
 						for _,header := range split_request[1: len(split_request)-1] {
-							log.Println("Header: ", len(header))
 							if header != "" {
 								addHeader(header, &requestHeader)
 							}
 						}
 						if _, okay := requestHeader.Header["Host"]; !okay{
 							requestHeader.Code = 400
+							log.Println("question mark")
 							hs.handleBadRequest(conn)
 						}
 					} else {
@@ -61,6 +61,16 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 						new_string := m1.ReplaceAllString(request, "")
 						requestString = new_string
 					}
+					go func() {
+						if requestHeader.Done != "Done" && requestHeader.Code == 200 {
+							requestHeader.Done = hs.handleResponse(&requestHeader,conn)
+							requestString = ""
+						} else if requestHeader.Code == 400 {
+							hs.handleBadRequest(conn)
+							requestHeader.Done = "Done"
+							return
+						}
+					}()
 				}
 			}
 		} else	{
@@ -77,16 +87,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 		}
 
 		//Finish sending response
-		go func() {
-			if requestHeader.Done != "Done" && requestHeader.Code == 200 {
-				requestHeader.Done = hs.handleResponse(&requestHeader,conn)
-				requestString = ""
-			} else if requestHeader.Code == 400 {
-				hs.handleBadRequest(conn)
-				requestHeader.Done = "Done"
-				return
-			}
-		}()
 		// Handle any complete requests
 		//if timeout occurs
 		// Set a timeout for read operation
@@ -132,7 +132,6 @@ func addHeader(str string, requestHeader *HttpRequestHeader){
 	new_str := strings.ReplaceAll(str, " ", "")
 	if strings.Contains(new_str, ":"){
 		header_string := strings.Split(new_str, ":")
-		log.Println(header_string)
 		if len(header_string) == 2 {
 			requestHeader.Header[header_string[0]] = header_string[1]
 		}
