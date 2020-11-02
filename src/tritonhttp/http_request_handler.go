@@ -51,7 +51,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 						}
 						if _, okay := requestHeader.Header["Host"]; !okay{
 							requestHeader.Code = 400
-							//hs.handleBadRequest(conn)
 						}
 					} else {
 						regex_string := "(\000)" + "{2,}"
@@ -130,7 +129,9 @@ func checkRequest(str string, requestHeader *HttpRequestHeader) {
 }
 
 func addHeader(str string, requestHeader *HttpRequestHeader){
-	new_str := strings.ReplaceAll(str, " ", "")
+	regex_string := "( )" + "{1,}"
+	m1 := regexp.MustCompile(regex_string)
+	new_str := m1.ReplaceAllString(str, "")
 	if strings.Contains(new_str, ":"){
 		header_string := strings.Split(new_str, ":")
 		if len(header_string) == 2 {
