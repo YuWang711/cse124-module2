@@ -98,7 +98,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 func checkRequest(str string, requestHeader *HttpRequestHeader) {
 	regex_string := "( )" + "{2,}"
 	m1 := regexp.MustCompile(regex_string)
-	new_string := m1.ReplaceAllString(str, "")
+	new_string := m1.ReplaceAllString(str, " ")
 	request_string := strings.Split(new_string, " ")
 	//If missing one out of three content
 	if len(request_string) < 3{
