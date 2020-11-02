@@ -36,38 +36,36 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 		if _,err := conn.Read(buf); err == nil{
 			requestString = requestString + string(buf)
 			log.Println("request:", requestString)
-			if strings.Contains(requestString, "\r\n\r\n") {
-				requests := strings.Split(requestString, "\r\n\r\n")
-				for _,request := range requests {
-					var requestHeader HttpRequestHeader
-					if strings.Contains(request, "\r\n"){
-						split_request := strings.Split(request, "\r\n")
-						checkRequest(split_request[0], &requestHeader)
-						requestHeader.Header = make(map[string]string)
-						for _,header := range split_request[1: len(split_request)-1] {
-							if header != "" {
-								addHeader(header, &requestHeader)
-							}
+			for strings.Contains(requestString, "\r\n\r\n") {
+				request := strings.SplitN(requestString, "\r\n\r\n",2)
+				var requestHeader HttpRequestHeader
+				if strings.Contains(request[0], "\r\n"){
+					split_request := strings.Split(request[0], "\r\n")
+					checkRequest(split_request[0], &requestHeader)
+					requestHeader.Header = make(map[string]string)
+					for _,header := range split_request[1: len(split_request)-1] {
+						if header != "" {
+							addHeader(header, &requestHeader)
 						}
-						if _, okay := requestHeader.Header["Host"]; !okay{
-							requestHeader.Code = 400
-						}
-					} else {
-						regex_string := "(\000)" + "{2,}"
-						m1 := regexp.MustCompile(regex_string)
-						new_string := m1.ReplaceAllString(request, "")
-						requestString = new_string
 					}
-					go func() {
-						if requestHeader.Done != "Done" && requestHeader.Code == 200 {
-							requestHeader.Done = hs.handleResponse(&requestHeader,conn)
-						} else if requestHeader.Code == 400 {
-							hs.handleBadRequest(conn)
-							requestHeader.Done = "Done"
-							return
-						}
-					}()
+					if _, okay := requestHeader.Header["Host"]; !okay{
+						requestHeader.Code = 400
+					}
+				} else {
+					regex_string := "(\000)" + "{2,}"
+					m1 := regexp.MustCompile(regex_string)
+					new_string := m1.ReplaceAllString(request[0], "")
+					requestString = new_string
 				}
+				go func() {
+					if requestHeader.Done != "Done" && requestHeader.Code == 200 {
+						requestHeader.Done = hs.handleResponse(&requestHeader,conn)
+					} else if requestHeader.Code == 400 {
+						hs.handleBadRequest(conn)
+						requestHeader.Done = "Done"
+						return
+					}
+				}()
 			}
 		} else	{
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
