@@ -26,7 +26,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 	timeoutDuration := 5 * time.Second
 	// Start a loop for reading requests continuously
 
-	buf := make([]byte, 1024)
+	buf := make([]byte, 2048)
 	var requestString string
 	for {
 		// Validate the request lines that were read
