@@ -66,6 +66,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 						return
 					}
 				}()
+				requestString = request[1]
 			}
 		} else	{
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
