@@ -51,9 +51,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 					if _, okay := requestHeader.Header["Host"]; !okay{
 						requestHeader.Code = 400
 					}
-					regex_string := "(\000)" + "{1,}"
-					m1 := regexp.MustCompile(regex_string)
-					new_string := m1.ReplaceAllString(request[1], "")
 					requestString = request[1]
 					go func() {
 						if requestHeader.Done != "Done" && requestHeader.Code == 200 {
