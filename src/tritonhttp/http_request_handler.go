@@ -64,7 +64,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 							requestHeader.Done = hs.handleResponse(&requestHeader,conn)
 							requestString = ""
 						} else if requestHeader.Code == 400 {
-							//hs.handleBadRequest(conn)
+							hs.handleBadRequest(conn)
 							requestHeader.Done = "Done"
 							return
 						}
