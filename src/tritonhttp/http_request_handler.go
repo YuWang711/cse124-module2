@@ -26,7 +26,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 	timeoutDuration := 5 * time.Second
 	// Start a loop for reading requests continuously
 
-	buf := make([]byte, 2048)
+	buf := make([]byte, 1024)
 	var requestString string
 	for {
 		// Validate the request lines that were read
@@ -54,7 +54,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 					regex_string := "(\000)" + "{1,}"
 					m1 := regexp.MustCompile(regex_string)
 					new_string := m1.ReplaceAllString(request[1], "")
-					requestString = new_string
+					requestString = request[1]
 					go func() {
 						if requestHeader.Done != "Done" && requestHeader.Code == 200 {
 							requestHeader.Done = hs.handleResponse(&requestHeader,conn)
