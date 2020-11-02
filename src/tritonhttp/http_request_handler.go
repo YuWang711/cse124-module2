@@ -39,8 +39,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			for strings.Contains(requestString, "\r\n\r\n") {
 				request := strings.SplitN(requestString, "\r\n\r\n",2)
 				var requestHeader HttpRequestHeader
-				if strings.Contains(request[0], "\r\n") &&
-					request[0] != requestString {
+				if strings.Contains(request[0], "\r\n") {
 					split_request := strings.Split(request[0], "\r\n")
 					checkRequest(split_request[0], &requestHeader)
 					requestHeader.Header = make(map[string]string)
