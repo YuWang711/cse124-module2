@@ -39,7 +39,8 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			for strings.Contains(requestString, "\r\n\r\n") {
 				request := strings.SplitN(requestString, "\r\n\r\n",2)
 				var requestHeader HttpRequestHeader
-				if strings.Contains(request[0], "\r\n"){
+				if strings.Contains(request[0], "\r\n") &&
+					request[0] != requestString {
 					split_request := strings.Split(request[0], "\r\n")
 					checkRequest(split_request[0], &requestHeader)
 					requestHeader.Header = make(map[string]string)
@@ -51,6 +52,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 					if _, okay := requestHeader.Header["Host"]; !okay{
 						requestHeader.Code = 400
 					}
+					requestString = request[1]
 				} else {
 					regex_string := "(\000)" + "{2,}"
 					m1 := regexp.MustCompile(regex_string)
@@ -66,7 +68,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 						return
 					}
 				}()
-				requestString = request[1]
 			}
 		} else	{
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
