@@ -38,6 +38,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			log.Println("request:", requestString)
 			if strings.Contains(requestString, "\r\n\r\n") {
 				requests := strings.Split(requestString, "\r\n\r\n")
+				requests = append(requests, " ")
 				for _,request := range requests {
 					var requestHeader HttpRequestHeader
 					if strings.Contains(request, "\r\n"){
