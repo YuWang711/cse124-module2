@@ -51,7 +51,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 						}
 						if _, okay := requestHeader.Header["Host"]; !okay{
 							requestHeader.Code = 400
-							hs.handleBadRequest(conn)
+							//hs.handleBadRequest(conn)
 						}
 					} else {
 						regex_string := "(\000)" + "{2,}"
