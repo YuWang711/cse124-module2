@@ -52,12 +52,12 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 						requestHeader.Code = 400
 					}
 					requestString = request[1]
-				} else {
-					regex_string := "(\000)" + "{2,}"
-					m1 := regexp.MustCompile(regex_string)
-					new_string := m1.ReplaceAllString(request[0], "")
-					requestString = new_string
-				}
+				} //else {
+		//			regex_string := "(\000)" + "{2,}"
+		//			m1 := regexp.MustCompile(regex_string)
+	//				new_string := m1.ReplaceAllString(request[0], "")
+	//				requestString = new_string
+	//			}
 				go func() {
 					if requestHeader.Done != "Done" && requestHeader.Code == 200 {
 						requestHeader.Done = hs.handleResponse(&requestHeader,conn)
