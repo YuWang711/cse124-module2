@@ -33,26 +33,33 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 		//Double CRLF means the quest is ended
 		// buf is unreadable somehow
 		var requestHeader HttpRequestHeader
-		if size,err := conn.Read(buf); err == nil{
+		if _,err := conn.Read(buf); err == nil{
 			requestString = requestString + string(buf)
 			log.Println("request:", requestString)
-			log.Println("size:", size)
 			if strings.Contains(requestString, "\r\n\r\n") {
-				split_request := strings.Split(requestString, "\r\n")
-				checkRequest(split_request[0], &requestHeader)
-				requestHeader.Header = make(map[string]string)
-				for _,header := range split_request[1: len(split_request)-1] {
-					log.Println("Header: ", len(header))
-					if header != "" {
-						addHeader(header, &requestHeader)
+				requests := strings.Split(requestString, "\r\n\r\n")
+				for _,request := range requests {
+					if strings.Contains(request, "\r\n"){
+						split_request := strings.Split(request, "\r\n")
+						split_request = append(split_request, "")
+						checkRequest(split_request[0], &requestHeader)
+						requestHeader.Header = make(map[string]string)
+						for _,header := range split_request[1: len(split_request)-1] {
+							log.Println("Header: ", len(header))
+							if header != "" {
+								addHeader(header, &requestHeader)
+							}
+						}
+						if _, okay := requestHeader.Header["Host"]; !okay{
+							requestHeader.Code = 400
+							hs.handleBadRequest(conn)
+						}
+					} else{
+						new_string := strings.ReplaceAll(request, string([]byte{0}), "")
+						requestString = new_string
 					}
 				}
-				if _, okay := requestHeader.Header["Host"]; !okay{
-					requestHeader.Code = 400
-					hs.handleBadRequest(conn)
-				}
-				requestString = ""
-			} 
+			}
 		} else	{
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
 				if requestString != "" {
