@@ -43,7 +43,7 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 					split_request := strings.Split(request[0], "\r\n")
 					checkRequest(split_request[0], &requestHeader)
 					requestHeader.Header = make(map[string]string)
-					for _,header := range split_request[1: len(split_request)-1] {
+					for _,header := range split_request[1: len(split_request)] {
 						if header != "" {
 							addHeader(header, &requestHeader)
 						}
