@@ -61,7 +61,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 					go func() {
 						if requestHeader.Done != "Done" && requestHeader.Code == 200 {
 							requestHeader.Done = hs.handleResponse(&requestHeader,conn)
-							requestString = ""
 						} else if requestHeader.Code == 400 {
 							hs.handleBadRequest(conn)
 							requestHeader.Done = "Done"
