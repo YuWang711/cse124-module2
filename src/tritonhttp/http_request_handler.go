@@ -55,7 +55,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 			} 
 		} else	{
 			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
-				log.Println("read timeout:", err)
 				if requestString != "" {
 					hs.handleBadRequest(conn)
 				}
@@ -65,13 +64,13 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 				conn.Close()
 				return
 			}
-			log.Println("read error:", err)
 		}
 
 		//Finish sending response
 		go func() {
 			if requestHeader.Done != "Done" && requestHeader.Code == 200 {
 				requestHeader.Done = hs.handleResponse(&requestHeader,conn)
+				requestString = ""
 			} else if requestHeader.Code == 400 {
 				hs.handleBadRequest(conn)
 				requestHeader.Done = "Done"
