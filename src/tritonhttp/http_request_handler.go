@@ -8,6 +8,7 @@ import (
 	"time"
 //	"flag"
 	"strings"
+	"regexp"
 )
 
 /* 
@@ -54,8 +55,10 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 							requestHeader.Code = 400
 							hs.handleBadRequest(conn)
 						}
-					} else{
-						new_string := strings.ReplaceAll(request, string([]byte{0}), "")
+					} else {
+						regex_string := "(\000)" + "{2,}"
+						m1 := regexp.MustCompile(regex_string)
+						new_string := m1.ReplaceAllString(request, "")
 						requestString = new_string
 					}
 				}
