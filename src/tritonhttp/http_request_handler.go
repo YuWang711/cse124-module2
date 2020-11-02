@@ -42,7 +42,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 					var requestHeader HttpRequestHeader
 					if strings.Contains(request, "\r\n"){
 						split_request := strings.Split(request, "\r\n")
-						split_request = append(split_request, "")
 						checkRequest(split_request[0], &requestHeader)
 						requestHeader.Header = make(map[string]string)
 						for _,header := range split_request[1: len(split_request)-1] {
@@ -52,7 +51,6 @@ func (hs *HttpServer) handleConnection(conn net.Conn) {
 						}
 						if _, okay := requestHeader.Header["Host"]; !okay{
 							requestHeader.Code = 400
-							log.Println("question mark")
 							hs.handleBadRequest(conn)
 						}
 					} else {
