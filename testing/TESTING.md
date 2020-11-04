@@ -1,6 +1,8 @@
 
 
 I'm using python unit test to test my code. The file should be test.py command: python test.py result is in an output file.
+I'm using Concurrency when sending response, so if I ran all the tests all together. I have some serious out of order responses.
+Therefore, I test each of them one by one instead of running them all together.
 
 List of tests are:
 
